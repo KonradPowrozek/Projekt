@@ -1,4 +1,6 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -89,7 +91,40 @@ class Customer {
 }
 
 public class Main {
+    private static void addProductToDatabase(String filename, ArrayList<Product> products) {
+        Scanner scanner = new Scanner(System.in);
 
+        System.out.print("Podaj ID produktu: ");
+        int productId = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.print("Podaj nazwę produktu: ");
+        String productName = scanner.nextLine();
+
+        System.out.print("Podaj cenę produktu: ");
+        double price = scanner.nextDouble();
+        scanner.nextLine();
+
+        System.out.print("Podaj ilość w magazynie: ");
+        int quantityInStock = scanner.nextInt();
+        scanner.nextLine();
+
+        Product newProduct = new Product(productName, price, quantityInStock);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename, true))) {
+            String productData = productId + "," + productName + "," + price + "," + quantityInStock;
+            writer.write(productData);
+            writer.newLine();
+            writer.flush();
+
+            System.out.println("Produkt został dodany do bazy danych.");
+
+            products.add(newProduct);  // Dodaj nowy produkt do listy dostępnych produktów
+
+        } catch (IOException e) {
+            System.out.println("Błąd zapisu do pliku.");
+        }
+    }
     public static void main(String[] args) {
         ArrayList<Product> products = loadProductsFromFile("magazyn.txt");
         Scanner scanner = new Scanner(System.in);
@@ -136,28 +171,7 @@ public class Main {
                 } else {
                     System.out.println("Niepoprawne dane logowania.");
                 }
-            } else if (isRegularCustomer) {
-                System.out.print("Podaj imię: ");
-                String firstName = scanner.nextLine();
-                System.out.print("Podaj nazwisko: ");
-                String lastName = scanner.nextLine();
-                System.out.print("Podaj 5-cyfrowy kod: ");
-                int verificationCode = scanner.nextInt();
-                scanner.nextLine();
-
-                boolean isRegistered = checkCustomerRegistration(firstName, lastName, verificationCode);
-                if (isRegistered) {
-                    System.out.print("Podaj ilość pieniędzy w portfelu: ");
-                    double walletAmount = scanner.nextDouble();
-                    scanner.nextLine();
-
-                    Customer customer = new Customer(firstName, lastName, verificationCode, false, true, walletAmount);
-                    System.out.println("Zalogowano jako stały klient detaliczny.");
-                    processOrder(customer, products);
-                } else {
-                    System.out.println("Niepoprawne dane logowania.");
-                }
-            } else if (isWholesaleCustomer) {
+            }  else if (isWholesaleCustomer) {
                 System.out.print("Podaj ilość pieniędzy w portfelu: ");
                 double walletAmount = scanner.nextDouble();
                 scanner.nextLine();
@@ -169,8 +183,10 @@ public class Main {
                 System.out.println("Niepoprawne dane logowania.");
             }
         }
-    }
 
+
+
+    }
     private static ArrayList<Product> loadProductsFromFile(String filename) {
         ArrayList<Product> products = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
@@ -226,6 +242,19 @@ public class Main {
                 System.out.println((i + 1) + ". " + product.getName() + " - Cena: " + product.getPrice() + " zł - Ilość dostępna: " + product.getQuantityInStock());
             }
 
+            System.out.print("Czy chcesz dodać nowy produkt do bazy danych? (Tak/Nie): ");
+            String addProductChoice = scanner.nextLine();
+
+            if (addProductChoice.equalsIgnoreCase("Tak")) {
+                addProductToDatabase("magazyn.txt", products);
+            }
+
+
+            System.out.println("\n Lista dostępnych produktów:");
+            for (int i = 0; i < products.size(); i++) {
+                Product product = products.get(i);
+                System.out.println((i + 1) + ". " + product.getName() + " - Cena: " + product.getPrice() + " zł - Ilość dostępna: " + product.getQuantityInStock());
+            }
             System.out.print("\nPodaj numer produktu, który chcesz dodać do koszyka (lub '0' aby zakończyć): ");
             choice = scanner.nextLine();
 
@@ -301,21 +330,6 @@ public class Main {
             } else {
                 System.out.println("Brak wystarczających środków w portfelu.");
             }
-        } else if (customer.isRegularCustomer()) {
-            double discount = totalPrice * 0.05;
-            double finalPrice = totalPrice - discount;
-            System.out.println("Rabat dla stałego klienta detalicznego (5%): " + discount + " zł");
-            System.out.println("Cena do zapłaty (po rabacie): " + finalPrice + " zł");
-
-            // Aktualizacja portfela klienta
-            double remainingAmount = customer.getWalletAmount() - finalPrice;
-            if (remainingAmount >= 0) {
-                customer.setWalletAmount(remainingAmount);
-                System.out.println("Zamówienie zostało przyjęte.");
-                System.out.println("Pozostała kwota w portfelu: " + remainingAmount + " zł");
-            } else {
-                System.out.println("Brak wystarczających środków w portfelu.");
-            }
         } else {
             double finalPrice = totalPrice;
             System.out.println("Cena do zapłaty: " + finalPrice + " zł");
@@ -332,4 +346,3 @@ public class Main {
         }
     }
 }
-
