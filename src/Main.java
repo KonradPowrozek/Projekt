@@ -7,18 +7,22 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 class Product {
+    private int id;
     private String name;
     private double price;
     private int quantityInStock;
     private int quantityInCart;
 
     public Product(String name, double price, int quantityInStock) {
+        this.id = id;
         this.name = name;
         this.price = price;
         this.quantityInStock = quantityInStock;
         this.quantityInCart = 0;
     }
-
+    public int getId() {
+        return id;
+    }
     public String getName() {
         return name;
     }
@@ -120,6 +124,26 @@ public class Main {
             System.out.println("Produkt został dodany do bazy danych.");
 
             products.add(newProduct);  // Dodaj nowy produkt do listy dostępnych produktów
+
+        } catch (IOException e) {
+            System.out.println("Błąd zapisu do pliku.");
+        }
+    }
+    private static void updateProductQuantityInStock(String filename, ArrayList<Product> products) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            for (Product product : products) {
+                int productId = product.getId();
+                String productName = product.getName();
+                double price = product.getPrice();
+                int quantityInStock = product.getQuantityInStock();
+
+                String productData = productId + "," + productName + "," + price + "," + quantityInStock;
+                writer.write(productData);
+                writer.newLine();
+            }
+            writer.flush();
+
+            System.out.println("Aktualizacja bazy danych zakończona.");
 
         } catch (IOException e) {
             System.out.println("Błąd zapisu do pliku.");
@@ -234,12 +258,11 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         String choice;
-
         do {
             System.out.println("\nLista dostępnych produktów:");
             for (int i = 0; i < products.size(); i++) {
                 Product product = products.get(i);
-                System.out.println((i + 1) + ". " + product.getName() + " - Cena: " + product.getPrice() + " zł - Ilość dostępna: " + product.getQuantityInStock());
+                System.out.println((i+1)+ ". " + product.getName() + " - Cena: " + product.getPrice() + " zł - Ilość dostępna: " + product.getQuantityInStock());
             }
 
             System.out.print("Czy chcesz dodać nowy produkt do bazy danych? (Tak/Nie): ");
@@ -253,7 +276,7 @@ public class Main {
             System.out.println("\n Lista dostępnych produktów:");
             for (int i = 0; i < products.size(); i++) {
                 Product product = products.get(i);
-                System.out.println((i + 1) + ". " + product.getName() + " - Cena: " + product.getPrice() + " zł - Ilość dostępna: " + product.getQuantityInStock());
+                System.out.println((i+1) + ". " + product.getName() + " - Cena: " + product.getPrice() + " zł - Ilość dostępna: " + product.getQuantityInStock());
             }
             System.out.print("\nPodaj numer produktu, który chcesz dodać do koszyka (lub '0' aby zakończyć): ");
             choice = scanner.nextLine();
@@ -269,9 +292,9 @@ public class Main {
                     scanner.nextLine();
 
                     if (selectedProduct.getQuantityInStock() >= quantity) {
-                        selectedProduct.updateQuantityInStock(quantity);
                         selectedProduct.setQuantityInCart(quantity);
                         System.out.println("Produkt dodany do koszyka.");
+                        selectedProduct.updateQuantityInStock(quantity);
 
                         // Wyświetlanie wartości bieżącego koszyka
                         double currentCartValue = 0;
@@ -344,5 +367,6 @@ public class Main {
                 System.out.println("Brak wystarczających środków w portfelu.");
             }
         }
-    }
+        updateProductQuantityInStock("magazyn.txt", products);}
 }
+
