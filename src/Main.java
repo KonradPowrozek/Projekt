@@ -272,8 +272,10 @@ public class Main {
         System.out.println("\nŁączna cena zamówienia: " + totalPrice + " zł");
 
         if (customer.isWholesaleCustomer() && customer.isRegularCustomer()) {
-            double finalPrice = totalPrice;
-            System.out.println("Cena do zapłaty: " + finalPrice + " zł");
+            double discount = totalPrice * 0.2;
+            double finalPrice = totalPrice - discount;
+            System.out.println("Rabat dla stałego klienta hurtowego (20%): " + discount + " zł");
+            System.out.println("Cena do zapłaty (po rabacie): " + finalPrice + " zł");
 
             // Aktualizacja portfela klienta
             double remainingAmount = customer.getWalletAmount() - finalPrice;
@@ -285,8 +287,10 @@ public class Main {
                 System.out.println("Brak wystarczających środków w portfelu.");
             }
         } else if (customer.isWholesaleCustomer()) {
-            double finalPrice = totalPrice;
-            System.out.println("Cena do zapłaty: " + finalPrice + " zł");
+            double discount = totalPrice * 0.1;
+            double finalPrice = totalPrice - discount;
+            System.out.println("Rabat dla klienta hurtowego (10%): " + discount + " zł");
+            System.out.println("Cena do zapłaty (po rabacie): " + finalPrice + " zł");
 
             // Aktualizacja portfela klienta
             double remainingAmount = customer.getWalletAmount() - finalPrice;
@@ -298,8 +302,10 @@ public class Main {
                 System.out.println("Brak wystarczających środków w portfelu.");
             }
         } else if (customer.isRegularCustomer()) {
-            double finalPrice = totalPrice;
-            System.out.println("Cena do zapłaty  " + finalPrice + " zł");
+            double discount = totalPrice * 0.05;
+            double finalPrice = totalPrice - discount;
+            System.out.println("Rabat dla stałego klienta detalicznego (5%): " + discount + " zł");
+            System.out.println("Cena do zapłaty (po rabacie): " + finalPrice + " zł");
 
             // Aktualizacja portfela klienta
             double remainingAmount = customer.getWalletAmount() - finalPrice;
