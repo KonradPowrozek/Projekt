@@ -165,8 +165,21 @@ public class Main {
             processOrder(customer, products);
 
         } else {
-            System.out.print("Czy jesteś stałym klientem? (Tak/Nie): ");
+            System.out.println("Czy jesteś stałym klientem? Wpisz rejestracja jeżeli nie jesteś stałym klientem, a chciałbyś się zarejestrować (Tak/Nie/Rejestracja): ");
             String regularChoice = scanner.nextLine();
+
+            if (regularChoice.equalsIgnoreCase("Rejestracja")) {
+                System.out.print("Podaj imię: ");
+                String firstName = scanner.nextLine();
+                System.out.print("Podaj nazwisko: ");
+                String lastName = scanner.nextLine();
+                System.out.print("Podaj 5-cyfrowy kod: ");
+                int verificationCode = scanner.nextInt();
+                scanner.nextLine();
+
+                registerNewCustomer(firstName, lastName, verificationCode);
+            }
+
 
             System.out.print("Czy jesteś klientem hurtowym? (Tak/Nie): ");
             String wholesaleChoice = scanner.nextLine();
@@ -252,6 +265,20 @@ public class Main {
             System.out.println("Błąd odczytu pliku baza.txt.");
         }
         return false;
+    }
+    private static void registerNewCustomer(String firstName, String lastName, int verificationCode) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("baza.txt", true))) {
+            String customerData = firstName + "," + lastName + "," + verificationCode;
+            writer.write(customerData);
+            writer.newLine();
+            writer.flush();
+
+            System.out.println("Rejestracja klienta została zakończona.");
+
+
+        } catch (IOException e) {
+            System.out.println("Błąd zapisu do pliku baza.txt.");
+        }
     }
 
     private static void processOrder(Customer customer, ArrayList<Product> products) {
